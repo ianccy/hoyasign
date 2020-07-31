@@ -37,8 +37,43 @@
 <body>
 <!--[if lt IE 8]><div style="position:fixed; width:100%; z-index:2147483647"><div id="UpgradeBrowser">你的瀏覽器不支援 HTML5 與 CSS3 等技術，建議你更新到 <a href="http://goo.gl/5xxC1" target="_blank">Internet Explorer 9</a> 以上，或是 <a href="http://goo.gl/N0PrP" target="_blank">Google Chrome</a>、<a href="http://goo.gl/XNwci" target="_blank">Firefox</a>、<a href="http://goo.gl/qxAKT" target="_blank">Opera</a> 以體驗臻至完美的網路世界。</div></div><![endif]-->
 <!-- Navigation -->
-<?php $pageName = "work"; ?>
-<?php include("../php/nav.php"); ?>
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/"><img alt="弘揚廣告"></a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="page-scroll">
+                    <a href="https://www.hoyasign.com/hoya">公司介紹</a>
+                </li>
+                <li class="page-scroll dropdown"><a href="javascript:;" onclick="$(window).width() <= 768 && $('.sub-menu').toggle() ;">服務項目 <i class="fa fa-angle-down"></i></a>
+                        <ul role="menu" class="sub-menu">
+                            <li><a href="https://www.hoyasign.com/signproduce/">招牌製作</a></li>
+                            <li><a href="https://www.hoyasign.com/signdesign/">招牌設計</a></li>
+                            <li><a href="https://www.hoyasign.com/shopsign/">店面招牌</a></li>
+                            <li><a href="https://www.hoyasign.com/fontsign/">立體字招牌</a></li>
+                            <li><a href="https://www.hoyasign.com/adsign/">廣告看板</a></li>
+                            <li><a href="https://www.hoyasign.com/acrylic/">壓克力製品</a></li>
+                        </ul>
+                    </li>
+                <li class="page-scroll" id="current">
+                    <a href="https://www.hoyasign.com/work/">合作作品</a>
+                </li>
+                <li class="page-scroll">
+                    <a href="https://www.hoyasign.com/contactus">聯絡我們</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
     <header  class="carousel slide">
         <div class="carousel-inner">
             <div class="item active">
@@ -82,7 +117,136 @@
 	</div>
 </div>
 </article>
- <?php include("../php/sform.php"); ?>
+<div class="short-form" id="shortForm">
+    <div class="container">
+        <h3 class="tit-form">洽詢服務</h3>
+        <form id="form" class="form-content">
+            <div class="form-left">
+            姓名:<span style="color:red">※</span><br/> <input type="text" class="form-control" id="name" name="first_name" title="請填寫姓名">
+            </div>
+               <div class="form-right">
+               電話:<span style="color:red">※</span><br/><input type="phone" class="form-control" id="phone" name="phone" title="請填寫電話">
+               
+               </div>
+        信箱: <input id="email" type="email" class="form-control" name="email"><br/>
+         <?php echo $emailErr;?>
+        詢問內容:<span style="color:red">※</span><br><textarea rows="5" id="message" class="form-control" name="message" cols="30" required title="請填寫需求"></textarea><br/>
+        <p class="form-inform">請填寫欲詢問的 產品 / 招牌。   <span style="white-space: nowrap;">(如需詢價請填寫材質、尺寸)</span>
+        <span style="white-space: nowrap;float: right;color: #ff0000;">※ 為必填欄位</span>
+        </p>
+        <br/>
+        </form>
+        <input type="button" class="btn btn-primary" id="send-inform" value="立即洽詢">
+        <div class="loading" style="position: fixed;top: 0;background: rgba(241, 241, 241, 0.58);width: 100%;height: 100%;left: 0;z-index: 10000;display:none">
+          <img style="position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 250px;" src="https://www.hoyasign.com/img/animal.gif" alt="">
+          <div style="position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);font-size: 12px;">資料傳送中</div>
+        </div>
+    </div>
+</div>
+  <script src="../js/lightbox-plus-jquery.min.js"></script>
+  <script>
+  $(function(){
+    $('#phone').bind('keyup paste', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+    $('#name').bind('keypress', function() {
+        $('.name-hint').text('');
+        $(this).css('border','');
+    });
+    $('#phone').bind('keypress', function() {
+        $('.phone-hint').text('');
+        $(this).css('border','');
+    });
+
+  	hintForm();
+  	printNeed();
+    $('#send-inform').click(function (e) { 
+        e.preventDefault();
+        $('help-block').text('');
+        var status = true;
+        if ($('#name').val()=='') {
+            $('#name').css('border','2px solid #ff0000');
+            status=false;
+        }
+
+        if ($('#phone').val()=='' || !vaildphone($('#phone').val())) {
+            $('#phone').css('border','2px solid #ff0000');
+            status=false;
+        }
+
+        if ($('#message').val()=='') {
+            $('#message').css('border','2px solid #ff0000');
+            status=false;
+        }
+        if(!status){
+            return;
+        }
+
+        var name = $('#name').val()
+        var phone = $('#phone').val()
+        var email = $('#email').val();
+        var message = $('#message').val();
+        if(phone.substring(0, 1) !== '0'){
+            alert('電話開頭請包含區碼，例如北市地區(02)。手機請用 (09) 開頭。');
+            return;
+        }
+        $('#sendData').attr('disabled','disabled');
+        $('.loading').show();
+        sendAjax(name,phone,email,message);
+    });
+    
+  }); 
+  function hintForm(){
+  	var hint = '<div id="ask"><a href="#shortForm"><i class="fa fa-bullhorn" aria-hidden="true"></i>歡迎填表詢問</a></div>';
+  	$('body').append(hint);
+  	$('#ask').click(function(event) {
+  		$(this).css("right", "");
+  	});
+  	setTimeout(function(){ $('#ask').css("right", "0") }, 10000);
+  }
+  function printNeed(){
+  	var need = $('.breadcrumb .active').text().replace(/ /g,"")
+  	if(need == ''){
+  		need = '招牌'
+  	}
+  	$('#message').val('我想詢問 '+ need.replace(/\n/g, '') );
+  }
+  function vaildphone(str){
+      var reg=/^([0-9]|[\-])+$/g ; 
+      if(str.length<6 || str.length>12){ 
+      return false; 
+      } 
+      else{ 
+      return reg.exec(str); 
+      } 
+    }
+
+
+  function sendAjax(name,phone,email,message){
+            var currentdate = new Date(); 
+            var filltime =  currentdate.getFullYear() + "/"
+                            + (currentdate.getMonth()+1)  + "/"
+                            + currentdate.getDate() + "  "   
+                            + currentdate.getHours() + ":"  
+                            + currentdate.getMinutes() + ":" 
+                            + currentdate.getSeconds();
+
+            $.get("https://script.google.com/macros/s/AKfycby_CoHxTGYjmUkeHhOpaf5uBSRYykoXiS5lOTWsqejEX_C204E/exec", {
+                "name": name,
+                "phone": phone,
+                "email": email,
+                "need": message,
+                "time": filltime
+                    },
+                    function (data) {
+                        ga('send', 'event', 'form', 'fill-form', 'form-ask');
+						// $('#submit').trigger('click');
+                        $('.loading').hide();
+                        alert('感謝您的填表，已收到您的詢問，將盡快與您聯絡!!');
+                        $('#name,#phone,#email,#message').val('');
+                    });
+  }
+  </script>
  <footer>
 <div class="container footer-position">
 	<ul class="company">
@@ -96,7 +260,7 @@
 	<a href="https://www.facebook.com/hongyangsign" target="_blank" alt="弘揚廣告facebook"><i class="fa fa-facebook-square fa-2"></i></a>
     <a href="https://plus.google.com/104680463353144850402/about" target="_blank" alt="弘揚廣告google+"><i class="fa fa-google-plus-square"></i>
 </a></br>
-    © Hong Yang Corporation  <?php echo date("Y"); ?>
+    © Hong Yang Corporation 2020
 </div>
 </div>
 </footer>
