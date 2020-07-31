@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+User-agent: *
+Disallow: /admin/
+
+SITEMAP: https://www.hoyasign.com/sitemap.xml

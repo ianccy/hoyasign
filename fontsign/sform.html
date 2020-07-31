@@ -1,0 +1,103 @@
+<div class="short-form">
+    <div class="container">
+        <h3 class="tit-form">洽詢服務</h3>
+        <form id="form" class="form-content" action="" method="post">
+            <div class="form-left">
+            姓名:<span style="color:red">※</span><br/> <input type="text" class="form-control" id="name" name="first_name" required title="請填寫姓名">
+            <?php echo $nameErr;?>
+            </div>
+               <div class="form-right">
+               電話:<span style="color:red">※</span><br/><input type="phone" class="form-control" id="phone" name="phone" required title="請填寫電話">
+               
+               </div>
+        信箱: <input id="email" type="email" class="form-control" name="email"><br/>
+         <?php echo $emailErr;?>
+        詢問內容:<span style="color:red">※</span><br><textarea rows="5" id="message" class="form-control" name="message" cols="30" required title="請填寫需求"></textarea><br/>
+        <p class="form-inform">請填寫欲詢問的 產品 / 招牌。   <span style="white-space: nowrap;">(如需詢價請填寫材質、尺寸)</span>
+        <span style="white-space: nowrap;float: right;color: #ff0000;">※ 為必填欄位</span>
+        </p>
+        <br/>
+        <input type="submit" class="btn btn-primary" id="send-inform" name="submit" value="立即洽詢">
+        </form>
+        <div class="loading" style="position: fixed;top: 0;background: rgba(241, 241, 241, 0.58);width: 100%;height: 100%;left: 0;z-index: 10000;display:none">
+          <img style="position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 250px;" src="https://www.hoyasign.com/img/animal.gif" alt="">
+          <div style="position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);font-size: 12px;">資料傳送中</div>
+        </div>
+</div>
+  <script src="../js/lightbox-plus-jquery.min.js"></script>
+  <script>
+  $(function(){
+  		printNeed();
+	  $('#form').submit(function(event) {
+	    //event.preventDefault();
+	      $('.loading').show();
+            var currentdate = new Date(); 
+            var filltime =  currentdate.getFullYear() + "/"
+                            + (currentdate.getMonth()+1)  + "/"
+                            + currentdate.getDate() + "  "   
+                            + currentdate.getHours() + ":"  
+                            + currentdate.getMinutes() + ":" 
+                            + currentdate.getSeconds();
+
+            $.get("https://script.google.com/macros/s/AKfycby_CoHxTGYjmUkeHhOpaf5uBSRYykoXiS5lOTWsqejEX_C204E/exec", {
+                "name": document.getElementById("name").value,
+                "phone": document.getElementById("phone").value,
+                "email": document.getElementById("email").value,
+                "need": document.getElementById("message").value,
+                "time": filltime
+                    },
+                    function (data) {
+						return true;
+                    });
+	  	});
+  }) 
+  function printNeed(){
+  	var need = $('.breadcrumb .active').text();
+  	$('#message').val('我想詢問製作' + need )
+  }
+  </script>
+<?php if(isset($_POST['submit'])){
+include("PHPMailerAutoload.php"); //匯入PHPMailer類別  
+ 
+$mail= new PHPMailer(); //建立新物件   
+$mail->IsSMTP(); //設定使用SMTP方式寄信   
+$mail->SMTPAuth = true; //設定SMTP需要驗證   
+$mail->Host = "64.185.234.130"; //設定SMTP主機   
+$mail->Port = 25; //設定SMTP埠位，預設為25埠  
+$mail->CharSet = "utf-8"; //設定郵件編碼   
+ 
+$mail->Username = "hoyasign@hoyasign.com"; //設定驗證帳號   
+$mail->Password = "chu28150135"; //設定驗證密碼   
+ 
+$mail->From = "hoyasign@hoyasign.com"; //設定寄件者信箱   
+$mail->FromName = "弘揚廣告"; //設定寄件者姓名   
+ 
+$first_name = $_POST['first_name'];
+$phone = $_POST['phone'];
+$email = $_POST['email']; 
+$content =  $_POST['message'];
+
+$mail->Subject = "官網填表詢問 - " . $first_name; //設定郵件標題
+$mail->IsHTML(true); //設定郵件內容為HTML   
+
+$mailList =       // 代表收件者資訊的陣列   (信箱, 姓名, 代碼)
+        array(
+            //array("hy.hy8869@msa.hinet.net","弘揚官方信箱"),
+            array("chu2815@gmail.com","朱峻儼"),
+            //array("jason855213@gmail.com","朱峻緯")
+        );
+
+    foreach ($mailList as $receiver) {
+        $mail->AddAddress($receiver[0], $receiver[1]);  // 收件者郵件及名稱 
+        $mail->Body =                                   // AddAddress(receiverMail, receiverName)
+            $mail->Body ="姓名: ". $first_name ."<br/><br/>"."E-Mail: " .$email ."<br/><br/>"."電話: ".$phone ."<br/><br/>". "詢問內容: " . $_POST['message'] ."<br/><br/><a href='https://docs.google.com/spreadsheets/d/1iiFiYv-zNZ1mdROJRBw8ghnGG76rFSDQVPm6SyVn44Y/edit?usp=sharing' target='_blank'>弘揚 - 填表資料表</a>"; //設定郵件內容 
+}
+if(!$mail->Send()) {
+echo '<script type="text/javascript">alert("系統忙碌中，麻煩再填表一次。或撥打電話 02-28110518 專人接聽服務。");</script>'; 
+} else {
+echo "<script type='text/javascript'>sendform();ga('send', 'event', 'form', 'fill-form', 'form-ask');</script>";
+echo "<script type='text/javascript'>$('.loading').hide();</script>";
+echo '<script type="text/javascript">alert("非常感謝您洽詢，已收到資料, 我們將盡快與您連繫");</script>';
+}
+}
+?>
